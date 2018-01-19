@@ -55,5 +55,5 @@ static void myfini(int argc, char **argv, char **envp) {
 
 
 // Put our functions in the init and fini arrays
-__attribute__((section(".init_array"))) typeof(myinit) *__init = myinit;
-__attribute__((section(".fini_array"))) typeof(myfini) *__fini = myfini;
+static __attribute__((section(".init_array"))) typeof(myinit) *__init = myinit;
+static __attribute__((section(".fini_array"))) typeof(myfini) *__fini = myfini;

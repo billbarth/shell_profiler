@@ -1,19 +1,29 @@
 CC=gcc
 
-CFLAGS:=-fPIC -shared
-SRC:=initializer.c finalizer.c
+CFLAGS:=-fPIC -shared -g
+SRC:=init_fini.c
 OBJ:=$(patsubst %.c, %.o, $(SRC))
+EXEC:=libshell_profiler.so
 
-.PHONY: echo
+.PHONY: clean neat clobber echo
+
+$(EXEC): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
+
+init_fini.o: init_fini.c
 
 echo:
-	echo $(OBJ)
+	@echo $(OBJ)
 
-libshell_profiler.so: $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^
 
-%.c:
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+neat:
+	$(RM) *~ .*~
 
-main: main.o
-	$(CC) $(CFLAGS) -o $@ $^
+clean: neat
+	$(RM) $(OBJ)
+
+clobber: clean
+	$(RM) $(EXEC) 
+
+
+

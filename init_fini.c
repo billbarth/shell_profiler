@@ -3,10 +3,13 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 
-static struct timeval ts; // Start time from myinit
+static struct timeval t_start; // Start time from myinit
+static struct rusage r_start; // rusage from myinit
 static FILE* mystdout; // Hold our own stdout pointer
 static char myargv0[256];
+
 
 //Loop over argv and print the whole command line
 void print_argv(int argc, char **argv)
@@ -36,7 +39,8 @@ void myinit(int argc, char **argv, char **envp) {
   char *bash_line=calloc(256,sizeof(char));
   strncpy(myargv0,argv[0],strlen(argv[0]));
   bash_line=getenv("LINENO");
-  gettimeofday(&ts,NULL);
+  gettimeofday(&t_start,NULL);
+  getrusage(RUSAGE_SELF,&r_start);
   //  print_argv(argc,argv);
   //fprintf(mystdout,"%s: ",argv[0]);
   if (bash_line) fprintf(mystdout,"\n----%s----\n",bash_line);
@@ -45,12 +49,20 @@ void myinit(int argc, char **argv, char **envp) {
 static void myfini(int argc, char **argv, char **envp) {
   
   struct timeval te;
+  struct rusage r_end;
   gettimeofday(&te,NULL);
-  double elapsed=(double)(te.tv_sec-ts.tv_sec) +
-    1.e-6*(double)(te.tv_usec-ts.tv_usec);
+  getrusage(RUSAGE_SELF,&r_end);
+  double user_elapsed=(r_end.ru_utime.tv_sec - r_start.ru_utime.tv_sec) +
+    1.e-6*(r_end.ru_utime.tv_usec - r_start.ru_utime.tv_usec);
+  double sys_elapsed=(r_end.ru_stime.tv_sec - r_start.ru_stime.tv_sec) +
+    1.e-6*(r_end.ru_stime.tv_usec - r_start.ru_stime.tv_usec);
+
+  double elapsed=(double)(te.tv_sec-t_start.tv_sec) +
+    1.e-6*(double)(te.tv_usec-t_start.tv_usec);
   //  fprintf(mystdout,"%s: %s\nelapsed time: %15.7g",
   //	  __FILE__, __FUNCTION__,elapsed);
-  fprintf(mystdout,"+ %15.7g: %s\n",elapsed,myargv0);
+  fprintf(mystdout,"+ %15.7g %15.7g %15.7g: %s\n",
+	  elapsed,user_elapsed,sys_elapsed,myargv0);
 }
 
 

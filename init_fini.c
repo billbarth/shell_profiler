@@ -43,9 +43,11 @@ void myinit(int argc, char **argv, char **envp) {
     }
   // fix error check later
   // Hide LINENO testing code for now
-  // char *bash_line=calloc(256,sizeof(char));
+  char *bash_line=calloc(256,sizeof(char));
   strncpy(myargv0,argv[0],strlen(argv[0]));
-  // bash_line=getenv("LINENO");
+  bash_line=getenv("LINENO");
+
+  printf("bash line: %s\n",bash_line);
 
   gettimeofday(&t_start,NULL);
   getrusage(RUSAGE_SELF,&r_start);
@@ -62,12 +64,6 @@ static void myfini(int argc, char **argv, char **envp) {
   struct rusage r_end;
   gettimeofday(&te,NULL);
   getrusage(RUSAGE_SELF,&r_end);
-  // getrusage times aren't points in time, but elapsed already. No
-  // need to diff.
-//  double user_elapsed=(r_end.ru_utime.tv_sec - r_start.ru_utime.tv_sec) +
-//    1.e-6*(r_end.ru_utime.tv_usec - r_start.ru_utime.tv_usec);
-//  double sys_elapsed=(r_end.ru_stime.tv_sec - r_start.ru_stime.tv_sec) +
-//    1.e-6*(r_end.ru_stime.tv_usec - r_start.ru_stime.tv_usec);
 
   double user_elapsed=(r_end.ru_utime.tv_sec) +
     1.e-6*(r_end.ru_utime.tv_usec);
@@ -76,18 +72,11 @@ static void myfini(int argc, char **argv, char **envp) {
 
   double elapsed=(double)(te.tv_sec-t_start.tv_sec) +
     1.e-6*(double)(te.tv_usec-t_start.tv_usec);
-//  fprintf(myout,"+ %15.7g %15.7g %15.7g: %s\n",
-//	  elapsed,user_elapsed,sys_elapsed,myargv0);
+
   pid_t pid=getpid();
   fprintf(myout,
 	  "%d: cmd=\"%s\"\n  etime=%15.7g\n  utime=%15.7g\n  stime= %15.7g\n",
 	  pid,myargv0,elapsed,user_elapsed,sys_elapsed);
-
-  // Old attempt at JSON, delete later
-  //    fprintf(myout,"\"%d\": {\"cmd\": \"%s\", \"etime\": %15.7g, \"utime\": %15.7g, \"stime\": %15.7g}\n",
-  // pid,myargv0,elapsed,user_elapsed,sys_elapsed);
-//  fprintf(myout,"elapsed_time+ %15.7g %15.7g %15.7g: %s\n",
-  //	  elapsed,user_elapsed,sys_elapsed,myargv0);
 }
 
 

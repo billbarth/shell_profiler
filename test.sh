@@ -1,4 +1,14 @@
-#!/bin/bash
+#!/bin/bash -x
+
+GLOBAL=0
+
+f()
+{
+  GLOBAL=$(($GLOBAL + $LINENO))
+}
+
+
+#PS4='+ $(echo $LINENO)'
 
 #export LD_PRELOAD=./libshell_profiler.so
 

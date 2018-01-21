@@ -7,7 +7,14 @@ echo $SP_OUTFILE $*
 
 export LD_PRELOAD=/home1/00564/bbarth/snippets/shell_profiler/libshell_profiler.so
 
+set -x
+export PS4='+ $(echo $LINENO > /dev/null)'
+
 $*
+
+set +x
+export PS4='+ '
+
 
 unset LD_PRELOAD
 

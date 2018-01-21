@@ -2,3 +2,4 @@ main
 *.so
 *.out
 *.json*
+*.yaml*

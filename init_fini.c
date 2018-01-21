@@ -8,20 +8,14 @@
 
 #define HERE fprintf(stderr,"%s %d: ",__FILE__,__LINE__)
 
-/* This program sends slightly invalid JSON to $SP_OUTFILE or stdout
-   (a work in progress. Fix the final output with:
+// This program sends YAML to $SP_OUTFILE or stdout 
 
-   awk 'BEGIN{ print "{" } {print} END{ print "\}"}' $SP_OUTFILE > tmp && mv tmp $SP_OUTFILE
-
-   you can also capture the output into a new file.
-
- */
 static struct timeval t_start; // Start time from myinit
 static struct rusage r_start; // rusage from myinit
 static FILE* myout; // Hold our own stdout pointer
 static char myargv0[256]; // a place to hold a copy of argv[0]
 
-//Loop over argv and print the whole command line
+//Loop over argv and print the whole command line (remove this or consolidate to something that returns a single string of the whole command line, if needed.
 void print_argv(int argc, char **argv)
 {
   for(int i=0; i<argc; ++i)
@@ -35,41 +29,19 @@ void myinit(int argc, char **argv, char **envp) {
   char *sp_outfile=getenv("SP_OUTFILE");
 
   struct stat b;
-  if(sp_outfile && !stat(sp_outfile,&b))
+  int stat_error=stat(sp_outfile,&b);
+  if(sp_outfile && !stat_error) // file already exists, no header, keep going
     {
       myout=fopen(sp_outfile,"a+");
-      fprintf(myout,"\n,\n");
+      setvbuf(myout, NULL, _IONBF, 0); // unbuffer output
     }
-  else
+  else // file didn't already exist. Write header. (Document this)
     {
       myout=fopen(sp_outfile,"a+");
+      setvbuf(myout, NULL, _IONBF, 0); // unbuffer output
+      fprintf(myout,"---\n");
     }
-
   // fix error check later
-//if(!myout)
-//  {
-//    perror("failed to open SP_OUTFILE");
-//    abort();
-//  }
-//else //Keep going on stdout if SP_OUTFILE can't be opened
-//  {
-//    // dup stdout to global before anyone else, like the executable
-//    // itself has a chance to close(1)
-//    int outfd = dup(STDOUT_FILENO);
-//    if (outfd < 0)
-//	{
-//	  perror("bad file desc");
-//	  abort();
-//	}
-//    myout=fdopen(outfd,"w");
-//    if (!myout)
-//	{
-//	  perror("bad file handle: ");
-//	  abort();
-//	}
-//    }
-  //  printf("%s: %s\n", __FILE__, __FUNCTION__);
-
   // Hide LINENO testing code for now
   // char *bash_line=calloc(256,sizeof(char));
   strncpy(myargv0,argv[0],strlen(argv[0]));
@@ -100,9 +72,14 @@ static void myfini(int argc, char **argv, char **envp) {
 //  fprintf(myout,"+ %15.7g %15.7g %15.7g: %s\n",
 //	  elapsed,user_elapsed,sys_elapsed,myargv0);
   pid_t pid=getpid();
-  fprintf(myout,"\"%d\": {\"cmd\": \"%s\", \"etime\": %15.7g, \"utime\": %15.7g, \"stime\": %15.7g}\n",
+  fprintf(myout,
+	  "%d: cmd=\"%s\"\n  etime=%15.7g\n  utime=%15.7g\n  stime= %15.7g\n",
 	  pid,myargv0,elapsed,user_elapsed,sys_elapsed);
-  //  fprintf(myout,"elapsed_time+ %15.7g %15.7g %15.7g: %s\n",
+
+  // Old attempt at JSON, delete later
+  //    fprintf(myout,"\"%d\": {\"cmd\": \"%s\", \"etime\": %15.7g, \"utime\": %15.7g, \"stime\": %15.7g}\n",
+  // pid,myargv0,elapsed,user_elapsed,sys_elapsed);
+//  fprintf(myout,"elapsed_time+ %15.7g %15.7g %15.7g: %s\n",
   //	  elapsed,user_elapsed,sys_elapsed,myargv0);
 }
 

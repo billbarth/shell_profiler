@@ -62,10 +62,17 @@ static void myfini(int argc, char **argv, char **envp) {
   struct rusage r_end;
   gettimeofday(&te,NULL);
   getrusage(RUSAGE_SELF,&r_end);
-  double user_elapsed=(r_end.ru_utime.tv_sec - r_start.ru_utime.tv_sec) +
-    1.e-6*(r_end.ru_utime.tv_usec - r_start.ru_utime.tv_usec);
-  double sys_elapsed=(r_end.ru_stime.tv_sec - r_start.ru_stime.tv_sec) +
-    1.e-6*(r_end.ru_stime.tv_usec - r_start.ru_stime.tv_usec);
+  // getrusage times aren't points in time, but elapsed already. No
+  // need to diff.
+//  double user_elapsed=(r_end.ru_utime.tv_sec - r_start.ru_utime.tv_sec) +
+//    1.e-6*(r_end.ru_utime.tv_usec - r_start.ru_utime.tv_usec);
+//  double sys_elapsed=(r_end.ru_stime.tv_sec - r_start.ru_stime.tv_sec) +
+//    1.e-6*(r_end.ru_stime.tv_usec - r_start.ru_stime.tv_usec);
+
+  double user_elapsed=(r_end.ru_utime.tv_sec) +
+    1.e-6*(r_end.ru_utime.tv_usec);
+  double sys_elapsed=(r_end.ru_stime.tv_sec) +
+    1.e-6*(r_end.ru_stime.tv_usec);
 
   double elapsed=(double)(te.tv_sec-t_start.tv_sec) +
     1.e-6*(double)(te.tv_usec-t_start.tv_usec);

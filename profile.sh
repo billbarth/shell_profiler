@@ -1,20 +1,26 @@
 #!/bin/bash
 
+## export LINENO
+## 
+## trap 'echo "local: $LINENO" >> /tmp/lineno_test.txt'  DEBUG
+## 
+## for i in $(seq 0 10); do
+##   /bin/echo $i
+## done
+
 # Assumes that SP_OUTFILE is set. Test for this later.
 
-# Actually required to export
-echo $SP_OUTFILE $*
+## if ! echo $SP_OUTFILE | grep -q '^/'; then
+##   echo "SP_OUTFILE must be an absolute path"
+## else
+##   export SP_OUTFILE=`pwd`/sp.yaml
+##   echo "using SP_OUTFILE=$SP_OUTFILE instead"
+## fi
 
+# Actually required to export
 export LD_PRELOAD=/home1/00564/bbarth/snippets/shell_profiler/libshell_profiler.so
 
-set -x
-export PS4='+ $(echo $LINENO > /dev/null)'
-
 $*
-
-set +x
-export PS4='+ '
-
 
 unset LD_PRELOAD
 

@@ -14,6 +14,7 @@ static struct timeval t_start; // Start time from myinit
 static struct rusage r_start; // rusage from myinit
 static FILE* myout; // Hold our own stdout pointer
 static char myargv0[256]; // a place to hold a copy of argv[0]
+static char *bash_line; // a place to hold the bash line number
 
 //Loop over argv and print the whole command line (remove this or consolidate to something that returns a single string of the whole command line, if needed.
 void print_argv(int argc, char **argv)
@@ -43,12 +44,14 @@ void myinit(int argc, char **argv, char **envp) {
     }
   // fix error check later
   // Hide LINENO testing code for now
-  char *bash_line=calloc(256,sizeof(char));
+//  bash_line=calloc(256,sizeof(char));
+//  bash_line=getenv("LINENO");
+  //  if (!bash_line)
+  //  strncpy(bash_line,"0",1);
+
+  //  printf("bash line: %s\n",bash_line);
+
   strncpy(myargv0,argv[0],strlen(argv[0]));
-  bash_line=getenv("LINENO");
-
-  printf("bash line: %s\n",bash_line);
-
   gettimeofday(&t_start,NULL);
   getrusage(RUSAGE_SELF,&r_start);
 
@@ -58,8 +61,8 @@ void myinit(int argc, char **argv, char **envp) {
   // if (bash_line) fprintf(myout,"\n----%s----\n",bash_line);
 }
 
-static void myfini(int argc, char **argv, char **envp) {
-  
+static void myfini()
+{
   struct timeval te;
   struct rusage r_end;
   gettimeofday(&te,NULL);
@@ -74,8 +77,13 @@ static void myfini(int argc, char **argv, char **envp) {
     1.e-6*(double)(te.tv_usec-t_start.tv_usec);
 
   pid_t pid=getpid();
+  // bash_line commented out above, remove here
+//  fprintf(myout,
+//	  "%d: \n  line=%d\n  cmd=\"%s\"\n  etime=%15.7g\n  utime=%15.7g\n  stime=%15.7g\n",
+//	  pid,atoi(bash_line),myargv0,elapsed,user_elapsed,sys_elapsed);
+
   fprintf(myout,
-	  "%d: cmd=\"%s\"\n  etime=%15.7g\n  utime=%15.7g\n  stime= %15.7g\n",
+	  "%d: \n  cmd: \"%-s\"\n  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n",
 	  pid,myargv0,elapsed,user_elapsed,sys_elapsed);
 }
 

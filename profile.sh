@@ -20,6 +20,8 @@
 # Actually required to export
 export LD_PRELOAD=/home1/00564/bbarth/snippets/shell_profiler/libshell_profiler.so
 
+echo Running: "$*"
+
 $*
 
 unset LD_PRELOAD

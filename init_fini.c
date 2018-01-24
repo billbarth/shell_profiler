@@ -6,6 +6,8 @@
 #include <sys/resource.h>
 #include <sys/stat.h>
 
+// Need a message macro. Do not print to stdout or risk breaking things that rely on stdout of other programs in pipes. Either open own file for errors or write to stderr
+
 #define HERE fprintf(stderr,"%s %d: ",__FILE__,__LINE__)
 
 // This program sends YAML to $SP_OUTFILE or stdout 

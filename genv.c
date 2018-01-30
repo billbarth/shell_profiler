@@ -3,6 +3,7 @@
 void myinit(int argc, char **argv, char **envp) {
   printf("genv: %s\n",getenv("LN")?getenv("LN"):"not set");
   printf("----------\n");
+  printf("bs: %s\n",getenv("BS"));
 }
 
 int main(int argc, char* argv[])

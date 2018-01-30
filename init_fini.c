@@ -16,7 +16,10 @@ static struct timeval t_start; // Start time from myinit
 static struct rusage r_start; // rusage from myinit
 static FILE* myout; // Hold our own stdout pointer
 static char myargv0[256]; // a place to hold a copy of argv[0]
-static char *bash_line; // a place to hold the bash line number
+
+// These two are shell dependent, but ought to work in ksh with some work
+static int bash_line; // a place to hold the bash line number
+static char* bash_source; // bash script name
 
 //Loop over argv and print the whole command line (remove this or consolidate to something that returns a single string of the whole command line, if needed.
 void print_argv(int argc, char **argv)
@@ -46,10 +49,19 @@ void myinit(int argc, char **argv, char **envp) {
     }
   // fix error check later
   // Hide LINENO testing code for now
-//  bash_line=calloc(256,sizeof(char));
-//  bash_line=getenv("LINENO");
-  //  if (!bash_line)
-  //  strncpy(bash_line,"0",1);
+  // bash_line=calloc(256,sizeof(char));
+  // printf("LN: %s\n",getenv("LN"));
+  char *ln=getenv("LN");
+  if(ln)
+    bash_line=atoi(ln);
+  else
+    bash_line=-1;
+  bash_source=getenv("BS");
+  if (!bash_source) bash_source="Not set:";
+  
+
+  //  if (bash_line)
+  //    strncpy(bash_line,getenv("LN"),strlen(getenv("LN")));
 
   //  printf("bash line: %s\n",bash_line);
 
@@ -83,10 +95,15 @@ static void myfini()
 //  fprintf(myout,
 //	  "%d: \n  line=%d\n  cmd=\"%s\"\n  etime=%15.7g\n  utime=%15.7g\n  stime=%15.7g\n",
 //	  pid,atoi(bash_line),myargv0,elapsed,user_elapsed,sys_elapsed);
+  // Pre-line number code (save for posterity)
+  //fprintf(myout,
+  //	  "%d: \n  cmd: \"%-s\"\n  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n",
+  // 	  pid,myargv0,elapsed,user_elapsed,sys_elapsed);
 
+  // Now print with line number
   fprintf(myout,
-	  "%d: \n  cmd: \"%-s\"\n  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n",
-	  pid,myargv0,elapsed,user_elapsed,sys_elapsed);
+	  "%d: \n  file: \"%-s\"\n  cmd: \"%-s\"\n  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n  line: %-10d\n",
+	  pid,bash_source,myargv0,elapsed,user_elapsed,sys_elapsed,bash_line);
 }
 
 

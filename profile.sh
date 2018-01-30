@@ -1,13 +1,5 @@
 #!/bin/bash
 
-## export LINENO
-## 
-## trap 'echo "local: $LINENO" >> /tmp/lineno_test.txt'  DEBUG
-## 
-## for i in $(seq 0 10); do
-##   /bin/echo $i
-## done
-
 # Assumes that SP_OUTFILE is set. Test for this later.
 
 ## if ! echo $SP_OUTFILE | grep -q '^/'; then
@@ -16,6 +8,71 @@
 ##   export SP_OUTFILE=`pwd`/sp.yaml
 ##   echo "using SP_OUTFILE=$SP_OUTFILE instead"
 ## fi
+
+export BASH_ENV_ORIG=$BASH_ENV
+export TRAP_ENV=`mktemp -p . .trap_env.XXXXXXXX`
+echo $TRAP_ENV
+
+if file $1 | grep -q -E 'Bourne-Again'; then
+# set up for bash
+
+cat > "$TRAP_ENV" << 'EOF'
+
+. $BASH_ENV_ORIG
+
+module list
+
+trap ' export LN="$LINENO"; export BS="$BASH_SOURCE"; echo "$LN $BS"'  DEBUG
+
+EOF
+
+export BASH_ENV=$TRAP_ENV
+
+elif file $1 | grep -q -E 'Korn'; then
+  echo Found Korn shell
+
+# setup for Korn
+cat > "$TRAP_ENV" << 'EOF'
+
+. $BASH_ENV_ORIG
+
+module list #fails on KSH
+
+
+trap ' export LN="${.sh.lineno}"; export BS="${.sh.file}"; echo "TRAP $LN $BS"'  DEBUG
+
+EOF
+
+cat $TRAP_ENV
+export ENV=$TRAP_ENV
+
+elif file $1 | grep -q -E 'POSIX shell'; then
+#set up for /bin/sh
+cat > "$TRAP_ENV" << 'EOF'
+
+. $BASH_ENV_ORIG
+
+module list
+
+trap ' echo; In KSH trap; export LN="$LINENO"; export BS="$0"; echo "$LN $BS"'  DEBUG
+
+EOF
+export BASH_ENV=$TRAP_ENV
+
+fi
+
+function clean_up
+{
+  if [ -f $TRAP_ENV ]; then
+    rm $TRAP_ENV
+    
+  fi
+}
+
+trap clean_up EXIT
+
+export LN=1
+export BASH_SOURCE
 
 # Actually required to export
 export LD_PRELOAD=/home1/00564/bbarth/snippets/shell_profiler/libshell_profiler.so
@@ -26,12 +83,6 @@ $*
 
 unset LD_PRELOAD
 
-while [ ! -s $SP_OUTFILE ]; do
-  date
-done
-
-#no longer necesary
-# awk 'BEGIN{ print "{" } {print} END{ print "}"}' $SP_OUTFILE > tmp && mv tmp $SP_OUTFILE
 
 
 

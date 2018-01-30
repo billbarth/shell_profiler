@@ -3,3 +3,4 @@ main
 *.out
 *.json*
 *.yaml*
+dj_hdf5_test

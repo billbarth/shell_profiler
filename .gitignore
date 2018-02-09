@@ -4,3 +4,6 @@ main
 *.json*
 *.yaml*
 dj_hdf5_test
+.tmp*
+.trap*
+*_temp

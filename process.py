@@ -13,7 +13,8 @@ import textwrap
 # second argument is the time_type mode NOT CURRENTLY USED
 
 def main():
-  time_type='etime' # remove this and update the usage
+  time_type='etime' # figure out how to sort by this further down, see comment
+                    # below
   if (len(sys.argv) == 3):
     yaml_fn=sys.argv[1]
     time_type=sys.argv[2]
@@ -24,15 +25,15 @@ def main():
 
   data={}
 
-  with open(yaml_fn) as f:
-    data=yaml.safe_load(f)
+  with open(yaml_fn) as f: 
+    data=yaml.load(f)      #look at using load_all
 
 
   for pid in data.keys(): # need to find a way to iterate here over the sorted
                           # time_types in data from the YAML file
                           # sorted(data,key=some function here of data [?][time_type],reverse=True):
     c=data[pid]['cmd']
-    cmd_str=c #textwrap.fill(c+": ", 30) # disable for now, find a better way to
+    cmd_str=c.split('/')[-1] #textwrap.fill(c+": ", 30) # disable for now, find a better way to
               #                           print later
     bash_line=int(data[pid]['line'])
     bash_source=data[pid]['file']
@@ -44,7 +45,7 @@ def main():
     if (bash_source=="Not set:"):
       bash_source=10*' '
 
-    fmt_str="%-s(%-9d): %s %-15.7g %-15.7g %-15.7g"
+    fmt_str="%-s(%-9d): %10s %-15.7g %-15.7g %-15.7g"
     print( fmt_str % (bash_source,bash_line,cmd_str, et, ut, st) )
 
   ## Aggregate all the data below. Now we have line numbers, so print that

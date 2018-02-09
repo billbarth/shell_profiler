@@ -1,6 +1,6 @@
 #!/bin/sh
 
 /bin/echo "In"
-module list
+/bin/date
 /bin/echo "Out"
 /bin/echo $0

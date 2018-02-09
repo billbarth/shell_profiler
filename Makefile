@@ -3,6 +3,7 @@ CC=gcc
 CFLAGS:=-fPIC -shared -g
 SRC:=init_fini.c
 OBJ:=$(patsubst %.c, %.o, $(SRC))
+LDFLAGS=-ldl
 EXEC:=libshell_profiler.so
 
 .PHONY: clean neat clobber echo

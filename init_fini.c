@@ -1,3 +1,6 @@
+#define _GNU_SOURCE
+#include <dlfcn.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -16,6 +19,10 @@ static struct timeval t_start; // Start time from myinit
 static struct rusage r_start; // rusage from myinit
 static FILE* myout; // Hold our own stdout pointer
 static char myargv0[256]; // a place to hold a copy of argv[0]
+
+static char **myargv; // place to hold a pointer to the top of argv
+			// (will this even work?)
+static int myargc;
 
 // These two are shell dependent, but ought to work in ksh with some work
 static int bash_line; // a place to hold the bash line number
@@ -50,12 +57,13 @@ void myinit(int argc, char **argv, char **envp) {
   // fix error check later
   // Hide LINENO testing code for now
   // bash_line=calloc(256,sizeof(char));
-  // printf("LN: %s\n",getenv("LN"));
+  printf("LN: %s\n",getenv("LN"));
   char *ln=getenv("LN");
   if(ln)
     bash_line=atoi(ln);
   else
     bash_line=-1;
+  printf("bash_line %d\n",bash_line);
   bash_source=getenv("BS");
   if (!bash_source) bash_source="Not set:";
   
@@ -66,6 +74,12 @@ void myinit(int argc, char **argv, char **envp) {
   //  printf("bash line: %s\n",bash_line);
 
   strncpy(myargv0,argv[0],strlen(argv[0]));
+  
+  myargv=malloc(argc*sizeof(char*));
+  for (int iarg=0; iarg<argc; ++iarg)
+    myargv[iarg]=argv[iarg];
+  
+  myargc=argc;
   gettimeofday(&t_start,NULL);
   getrusage(RUSAGE_SELF,&r_start);
 
@@ -91,19 +105,56 @@ static void myfini()
     1.e-6*(double)(te.tv_usec-t_start.tv_usec);
 
   pid_t pid=getpid();
-  // bash_line commented out above, remove here
-//  fprintf(myout,
-//	  "%d: \n  line=%d\n  cmd=\"%s\"\n  etime=%15.7g\n  utime=%15.7g\n  stime=%15.7g\n",
-//	  pid,atoi(bash_line),myargv0,elapsed,user_elapsed,sys_elapsed);
-  // Pre-line number code (save for posterity)
-  //fprintf(myout,
-  //	  "%d: \n  cmd: \"%-s\"\n  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n",
-  // 	  pid,myargv0,elapsed,user_elapsed,sys_elapsed);
 
-  // Now print with line number
-  fprintf(myout,
-	  "%d: \n  file: \"%-s\"\n  cmd: \"%-s\"\n  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n  line: %-10d\n",
-	  pid,bash_source,myargv0,elapsed,user_elapsed,sys_elapsed,bash_line);
+//  Save this print for later since it works. Now implement something
+//  that prints the wole command line instead of just argv[0]
+//  fprintf(myout,
+//  	  "%d: \n  file: \"%-s\"\n  cmd: \"%-s\"\n  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n  line: %-10d\n",
+//  	  pid,bash_source,myargv0,elapsed,user_elapsed,sys_elapsed,bash_line);
+
+  fprintf(myout,"%d: \n  file: \"%-s\"\n",pid,bash_source); // first part of YAML record  
+  // print the whole command line to a single-line YAML record. Does this work with quotes?
+  fprintf(myout,"  cmdline: ");
+  for(int iarg=0; iarg<myargc; iarg++)
+    {
+      fprintf(myout,"%s ",myargv[iarg]);
+    }
+  fprintf(myout,"\n");
+  
+
+  fprintf(myout,"  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n  line: %-10d\n",myargv0,elapsed,user_elapsed,sys_elapsed,bash_line);
+}
+
+
+
+typedef int(*orig_execve_f_type)(const char* filename, char *const argv[], char* const envp[]);
+
+int execve(const char* filename, char *const argv[], char* const envp[])
+{
+  printf("Wrapping execve to call: %s\n",filename);
+  orig_execve_f_type orig_execve;
+  orig_execve = (orig_execve_f_type)dlsym(RTLD_NEXT,"execve");
+
+  char myfn[10];
+
+  if (strstr(filename,"/bin/ksh"))
+    {
+      strncpy(myfn,"/bin/bash",9);
+      printf("Found ksh, switching to %s\n",myfn);
+    }
+  else if(strstr(filename,"/bin/sh"))
+    {
+      strncpy(myfn,"/bin/bash",9);
+      printf("Found sh, switching to %s\n",myfn);
+    }
+  else
+    {
+      strcpy(myfn,filename);
+    }
+
+  
+  
+  return orig_execve(myfn,argv,envp);
 }
 
 

@@ -32,21 +32,25 @@ def main():
   for pid in data.keys(): # need to find a way to iterate here over the sorted
                           # time_types in data from the YAML file
                           # sorted(data,key=some function here of data [?][time_type],reverse=True):
-    c=data[pid]['cmd']
-    cmd_str=c.split('/')[-1] #textwrap.fill(c+": ", 30) # disable for now, find a better way to
-              #                           print later
+    c=data[pid]['cmdline']
+    cmd_str=c  #textwrap.fill(c+": ", 30) # disable for now, find a better way
+               #to print later
+               
     bash_line=int(data[pid]['line'])
     bash_source=data[pid]['file']
     et=float(data[pid]['etime'])
     ut=float(data[pid]['utime'])
     st=float(data[pid]['stime'])
+    shlvl=int(data[pid]['shlvl'])
+    #print('shlvl: ',shlvl)
+    indent='  '*int(data[pid]['shlvl'])
 
     # Get a max length for shell script name here
     if (bash_source=="Not set:"):
       bash_source=10*' '
 
-    fmt_str="%-s(%-9d): %10s %-15.7g %-15.7g %-15.7g"
-    print( fmt_str % (bash_source,bash_line,cmd_str, et, ut, st) )
+    fmt_str="%s%-s(%-9d): %10s %-15.7g %-15.7g %-15.7g"
+    print( fmt_str % (indent,bash_source,bash_line,cmd_str, et, ut, st) )
 
   ## Aggregate all the data below. Now we have line numbers, so print that
   ## instead

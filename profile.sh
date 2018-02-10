@@ -14,7 +14,7 @@ export MY_SHELL_SCRIPT="${1}_temp"
 
 export BASH_ENV_ORIG=$BASH_ENV
 export TRAP_ENV=`mktemp -p . .trap_env.XXXXXXXX`
-echo $TRAP_ENV
+#echo $TRAP_ENV
 
 if file $1 | grep -q -E 'Bourne-Again'; then
   # set up for bash
@@ -78,9 +78,9 @@ export BASH_ENV=$TRAP_ENV
 
 fi
 
-echo "--------------------"
-cat $TRAP_ENV
-echo "--------------------"
+#echo "--------------------"
+#cat $TRAP_ENV
+#echo "--------------------"
 
 function clean_up
 {
@@ -96,7 +96,7 @@ export LN=1
 export BASH_SOURCE
 
 # Actually required to export
-export LD_PRELOAD=/home1/00564/bbarth/snippets/shell_profiler/libshell_profiler.so
+export LD_PRELOAD=/scratch/00564/bbarth/shell_profiler/libshell_profiler.so
 
 if [ -f $MY_SHELL_SCRIPT ]; then
   cmd="$MY_SHELL_SCRIPT ${@:2}"

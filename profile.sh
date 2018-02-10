@@ -78,9 +78,9 @@ export BASH_ENV=$TRAP_ENV
 
 fi
 
-echo "--------------------"
-cat $TRAP_ENV
-echo "--------------------"
+## echo "--------------------"
+## cat $TRAP_ENV
+## echo "--------------------"
 
 function clean_up
 {
@@ -96,7 +96,11 @@ export LN=1
 export BASH_SOURCE
 
 # Actually required to export
-export LD_PRELOAD=/home1/00564/bbarth/snippets/shell_profiler/libshell_profiler.so
+PR_PATH=$(dirname $(readlink -f "$0"))
+
+echo "Path to .so: " "${PR_PATH}"
+
+export LD_PRELOAD="${PR_PATH}"/libshell_profiler.so
 
 if [ -f $MY_SHELL_SCRIPT ]; then
   cmd="$MY_SHELL_SCRIPT ${@:2}"

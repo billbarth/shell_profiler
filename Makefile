@@ -6,6 +6,8 @@ OBJ:=$(patsubst %.c, %.o, $(SRC))
 LDFLAGS=-ldl
 EXEC:=libshell_profiler.so
 
+all:: $(EXEC)
+
 .PHONY: clean neat clobber echo
 
 $(EXEC): $(OBJ)

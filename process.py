@@ -11,19 +11,31 @@ import textwrap
 # have the depth here.
 
 # second argument is the time_type mode NOT CURRENTLY USED
+# would need to read the whole file into memory to sort based in time_type
+# could do if file was under X bytes
+
+int_cmd_width=15
+max_cmd_width=str(int_cmd_width) #could make this a command line arg later
 
 def main():
-  time_type='etime' # figure out how to sort by this further down, see comment
-                    # below
+  # Disable this argument until we figure out how to sort by it
+  # time_type='etime' # figure out how to sort by this further down, see comment
+                      # below
+
+  # second arg is now the shell file that we want to print the line of, may want
+  # to do something else later if the called thing on that line is als a script
   if (len(sys.argv) == 3):
     yaml_fn=sys.argv[1]
-    time_type=sys.argv[2]
+    # time_type=sys.argv[2]
+    calling_script=sys.argv[2] # Maybe embed this in the YAML file
     print('Loading: ', yaml_fn)
   else:
-    print('Usage: ',sys.argv[0], 'YAML-file (etime|utime|stime)\nExiting...')
+    print('Usage: ',sys.argv[0], 'YAML-file main_script\nExiting...')
     exit(1)
 
   data={}
+
+  first=True
 
   with open(yaml_fn) as f: 
     data=yaml.load(f)      #look at using load_all
@@ -32,20 +44,35 @@ def main():
   for pid in data.keys(): # need to find a way to iterate here over the sorted
                           # time_types in data from the YAML file
                           # sorted(data,key=some function here of data [?][time_type],reverse=True):
-    c=data[pid]['cmd']
-    cmd_str=c.split('/')[-1] #textwrap.fill(c+": ", 30) # disable for now, find a better way to
-              #                           print later
+    c=data[pid]['cmdline']
+    cmd_str=c  #textwrap.fill(c+": ", 30) # disable for now, find a better way
+               #to print later
+               
     bash_line=int(data[pid]['line'])
     bash_source=data[pid]['file']
     et=float(data[pid]['etime'])
     ut=float(data[pid]['utime'])
     st=float(data[pid]['stime'])
+    shlvl=int(data[pid]['shlvl'])
+    #print('shlvl: ',shlvl)
+    #    indent='  '*int(data[pid]['shlvl'])
+    indent=''
 
     # Get a max length for shell script name here
     if (bash_source=="Not set:"):
-      bash_source=10*' '
+      bash_source=int_cmd_width*'-'
 
-    fmt_str="%-s(%-9d): %10s %-15.7g %-15.7g %-15.7g"
+
+    if first:
+      first=False
+      maxmin="15.8"
+      fmt_str="%-"+maxmin+"s  %4.4s: %"+"20.8"+"s %"+maxmin+"s %"+maxmin+"s %"+maxmin+"s"
+      print(fmt_str % ("command","line","cmdline","elapsed","user","system"))
+      print(fmt_str % (   "-"*15,"-"*15,   "-"*15,   "-"*15,"-"*15,  "-"*15))
+
+
+    maxmin=max_cmd_width+"."+max_cmd_width
+    fmt_str="%-"+maxmin+"s(%4d): %-"+"20.20"+"s %15.7g %15.7g %15.7g"
     print( fmt_str % (bash_source,bash_line,cmd_str, et, ut, st) )
 
   ## Aggregate all the data below. Now we have line numbers, so print that

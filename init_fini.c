@@ -27,6 +27,8 @@ static int myargc;
 // These two are shell dependent, but ought to work in ksh with some work
 static int bash_line; // a place to hold the bash line number
 static char* bash_source; // bash script name
+ 
+static int shlvl; //bash shell level to detect nesting, maybe won't work
 
 //Loop over argv and print the whole command line (remove this or consolidate to something that returns a single string of the whole command line, if needed.
 void print_argv(int argc, char **argv)
@@ -40,6 +42,11 @@ void print_argv(int argc, char **argv)
 void myinit(int argc, char **argv, char **envp) {
   // Check for SP_OUTFILE and either open it or dup stdout
   char *sp_outfile=getenv("SP_OUTFILE");
+
+  bash_line=-1;
+
+  char *shlvl_str=getenv("SHLVL");
+  if(shlvl_str) shlvl=atoi(shlvl_str);
 
   struct stat b;
   int stat_error=stat(sp_outfile,&b);
@@ -57,7 +64,8 @@ void myinit(int argc, char **argv, char **envp) {
   // fix error check later
   // Hide LINENO testing code for now
   // bash_line=calloc(256,sizeof(char));
-  printf("LN: %s\n",getenv("LN"));
+ printf("LN: %s\n",getenv("LN"));
+
   char *ln=getenv("LN");
   if(ln)
     bash_line=atoi(ln);
@@ -114,15 +122,18 @@ static void myfini()
 
   fprintf(myout,"%d: \n  file: \"%-s\"\n",pid,bash_source); // first part of YAML record  
   // print the whole command line to a single-line YAML record. Does this work with quotes?
-  fprintf(myout,"  cmdline: ");
+  fprintf(myout,"  cmdline: \"");
   for(int iarg=0; iarg<myargc; iarg++)
     {
       fprintf(myout,"%s ",myargv[iarg]);
     }
-  fprintf(myout,"\n");
+  fprintf(myout,"\"\n");
   
 
-  fprintf(myout,"  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n  line: %-10d\n",myargv0,elapsed,user_elapsed,sys_elapsed,bash_line);
+  fprintf(myout,"  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n  line: %-10d\n  shlvl: %-10d\n",
+	  elapsed,user_elapsed,sys_elapsed,bash_line,shlvl);
+
+
 }
 
 

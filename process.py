@@ -5,6 +5,7 @@ import os, sys, re
 import yaml
 from collections import defaultdict
 import textwrap
+import linecache
 
 # There was a collection of total elapsed time in here, but that's a lie since
 # it is duplicated across several nested executions of the shell, and we don't
@@ -40,7 +41,7 @@ def main():
   with open(yaml_fn) as f: 
     data=yaml.load(f)      #look at using load_all
 
-
+  lines=[]
   for pid in data.keys(): # need to find a way to iterate here over the sorted
                           # time_types in data from the YAML file
                           # sorted(data,key=some function here of data [?][time_type],reverse=True):
@@ -54,6 +55,7 @@ def main():
     ut=float(data[pid]['utime'])
     st=float(data[pid]['stime'])
     shlvl=int(data[pid]['shlvl'])
+
     #print('shlvl: ',shlvl)
     #    indent='  '*int(data[pid]['shlvl'])
     indent=''
@@ -74,6 +76,7 @@ def main():
     maxmin=max_cmd_width+"."+max_cmd_width
     fmt_str="%-"+maxmin+"s(%4d): %-"+"20.20"+"s %15.7g %15.7g %15.7g"
     print( fmt_str % (bash_source,bash_line,cmd_str, et, ut, st) )
+    print(bash_source+":"+str(bash_line)+":"+linecache.getline(bash_source,bash_line))
 
   ## Aggregate all the data below. Now we have line numbers, so print that
   ## instead

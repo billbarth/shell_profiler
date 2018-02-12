@@ -62,7 +62,7 @@ def main():
 
     # Get a max length for shell script name here
     if (bash_source=="Not set:"):
-      bash_source=int_cmd_width*'-'
+      bash_source=calling_script
 
 
     if first:
@@ -76,7 +76,7 @@ def main():
     maxmin=max_cmd_width+"."+max_cmd_width
     fmt_str="%-"+maxmin+"s(%4d): %-"+"20.20"+"s %15.7g %15.7g %15.7g"
     print( fmt_str % (bash_source,bash_line,cmd_str, et, ut, st) )
-    print(bash_source+":"+str(bash_line)+":"+linecache.getline(bash_source,bash_line))
+    print('+'*shlvl+' '+bash_source+":"+str(bash_line)+":"+linecache.getline(bash_source,bash_line),end='')
 
   ## Aggregate all the data below. Now we have line numbers, so print that
   ## instead

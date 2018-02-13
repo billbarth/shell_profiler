@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # Assumes that SP_OUTFILE is set. Test for this later.
 

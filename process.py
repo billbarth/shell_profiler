@@ -42,9 +42,10 @@ def main():
     data=yaml.load(f)      #look at using load_all
 
   lines=[]
-  for pid in data.keys(): # need to find a way to iterate here over the sorted
+  ### SAVE FOR LATER for pid in data.keys(): # need to find a way to iterate here over the sorted
                           # time_types in data from the YAML file
                           # sorted(data,key=some function here of data [?][time_type],reverse=True):
+  for pid in sorted(data,key=lambda x: data[x]['etime'],reverse=True):                        
     c=data[pid]['cmdline']
     cmd_str=c  #textwrap.fill(c+": ", 30) # disable for now, find a better way
                #to print later

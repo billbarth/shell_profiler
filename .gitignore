@@ -14,3 +14,4 @@ foo.log
 test
 test_[0-9]*.sh
 out[0-9]*.log
+exec_experiments

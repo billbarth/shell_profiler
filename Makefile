@@ -9,7 +9,7 @@ endif
 CFLAGS:=-fPIC -shared -g $(STD_FLAG)
 SRC:=init_fini.c
 OBJ:=$(patsubst %.c, %.o, $(SRC))
-LDFLAGS=-ldl
+LDFLAGS=
 EXEC:=libshell_profiler.so
 
 all:: $(EXEC)

@@ -1,6 +1,12 @@
 CC=gcc
 
-CFLAGS:=-fPIC -shared -g
+ifeq ($(CC),gcc)
+STD_FLAG=--std=c99
+else
+STD_FLAG=-std=c99
+endif
+
+CFLAGS:=-fPIC -shared -g $(STD_FLAG)
 SRC:=init_fini.c
 OBJ:=$(patsubst %.c, %.o, $(SRC))
 LDFLAGS=-ldl

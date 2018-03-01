@@ -179,5 +179,5 @@ int execve(const char* filename, char *const argv[], char* const envp[])
 
 
 // Put our functions in the init and fini arrays
-static __attribute__((section(".init_array"))) typeof(myinit) *__init = myinit;
-static __attribute__((section(".fini_array"))) typeof(myfini) *__fini = myfini;
+static __attribute__((section(".init_array"))) __typeof__(myinit) *__init = myinit;
+static __attribute__((section(".fini_array"))) __typeof__(myfini) *__fini = myfini;

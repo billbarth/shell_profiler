@@ -56,6 +56,7 @@ def main():
     ut=float(data[pid]['utime'])
     st=float(data[pid]['stime'])
     shlvl=int(data[pid]['shlvl'])
+    start_str=data[pid]['start-time']
 
     #print('shlvl: ',shlvl)
     #    indent='  '*int(data[pid]['shlvl'])
@@ -69,14 +70,14 @@ def main():
     if first:
       first=False
       maxmin="15.8"
-      fmt_str="%-"+maxmin+"s  %4.4s: %"+"20.8"+"s %"+maxmin+"s %"+maxmin+"s %"+maxmin+"s"
-      print(fmt_str % ("command","line","cmdline","elapsed","user","system"))
-      print(fmt_str % (   "-"*15,"-"*15,   "-"*15,   "-"*15,"-"*15,  "-"*15))
+      fmt_str="%19s "+"%-"+maxmin+"s  %4.4s  %"+"20.8"+"s %"+maxmin+"s %"+maxmin+"s %"+maxmin+"s"
+      print(fmt_str % ("start time","command","line","cmdline","elapsed","user","system"))
+      print(fmt_str % ("-"*19,   "-"*15,"-"*15,   "-"*15,   "-"*15,"-"*15,  "-"*15))
 
 
     maxmin=max_cmd_width+"."+max_cmd_width
-    fmt_str="%-"+maxmin+"s(%4d): %-"+"20.20"+"s %15.7g %15.7g %15.7g"
-    print( fmt_str % (bash_source,bash_line,cmd_str, et, ut, st) )
+    fmt_str="%19s "+"%-"+maxmin+"s(%4d): %-"+"20.20"+"s %15.7g %15.7g %15.7g"
+    print( fmt_str % (start_str,bash_source,bash_line,cmd_str, et, ut, st) )
     print('+'*shlvl+' '+bash_source+":"+str(bash_line)+":"+linecache.getline(bash_source,bash_line),end='')
 
   ## Aggregate all the data below. Now we have line numbers, so print that

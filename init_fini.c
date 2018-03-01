@@ -115,11 +115,11 @@ static void myfini()
 
   char start_time_str[256]="";
   
-//  time_t nowtime = t_start.tv_sec;
-//  struct tm *nowtm;
-//  nowtm = localtime(&nowtime);
-//
-//  strftime(&start_time_str, 256, "%Y-%m-%d %H:%M:%S", nowtm);
+  time_t nowtime = t_start.tv_sec;
+  struct tm *nowtm;
+  nowtm = localtime(&nowtime);
+
+  strftime(&start_time_str, 256, "%Y-%m-%d %H:%M:%S", nowtm);
 
   pid_t pid=getpid();
 
@@ -139,8 +139,8 @@ static void myfini()
   fprintf(myout,"\"\n");
   
 
-  fprintf(myout,"  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n  line: %-10d\n  shlvl: %-10d\n",
-	  elapsed,user_elapsed,sys_elapsed,bash_line,shlvl);
+  fprintf(myout,"  etime: %-15.7g\n  utime: %-15.7g\n  stime: %-15.7g\n  line: %-10d\n  shlvl: %-10d\n  start-time: \"%s\"\n",
+	  elapsed,user_elapsed,sys_elapsed,bash_line,shlvl,start_time_str);
 
 
 }

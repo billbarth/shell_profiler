@@ -146,36 +146,37 @@ static void myfini()
 }
 
 
+// No longer trying to replace ksh with bash, so commenting this out!
 
-typedef int(*orig_execve_f_type)(const char* filename, char *const argv[], char* const envp[]);
-
-int execve(const char* filename, char *const argv[], char* const envp[])
-{
-  printf("Wrapping execve to call: %s\n",filename);
-  orig_execve_f_type orig_execve;
-  orig_execve = (orig_execve_f_type)dlsym(RTLD_NEXT,"execve");
-
-  char myfn[10];
-
-  if (strstr(filename,"/bin/ksh"))
-    {
-      strncpy(myfn,"/bin/bash",9);
-      printf("Found ksh, switching to %s\n",myfn);
-    }
-  else if(strstr(filename,"/bin/sh"))
-    {
-      strncpy(myfn,"/bin/bash",9);
-      printf("Found sh, switching to %s\n",myfn);
-    }
-  else
-    {
-      strcpy(myfn,filename);
-    }
-
-  
-  
-  return orig_execve(myfn,argv,envp);
-}
+// typedef int(*orig_execve_f_type)(const char* filename, char *const argv[], char* const envp[]);
+// 
+// int execve(const char* filename, char *const argv[], char* const envp[])
+// {
+//   printf("Wrapping execve to call: %s\n",filename);
+//   orig_execve_f_type orig_execve;
+//   orig_execve = (orig_execve_f_type)dlsym(RTLD_NEXT,"execve");
+// 
+//   char myfn[10];
+// 
+//   if (strstr(filename,"/bin/ksh"))
+//     {
+//       strncpy(myfn,"/bin/bash",9);
+//       printf("Found ksh, switching to %s\n",myfn);
+//     }
+//   else if(strstr(filename,"/bin/sh"))
+//     {
+//       strncpy(myfn,"/bin/bash",9);
+//       printf("Found sh, switching to %s\n",myfn);
+//     }
+//   else
+//     {
+//       strcpy(myfn,filename);
+//     }
+// 
+//   
+//   
+//   return orig_execve(myfn,argv,envp);
+// }
 
 
 // Put our functions in the init and fini arrays

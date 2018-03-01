@@ -8,6 +8,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
+#include <time.h>
 
 // Need a message macro. Do not print to stdout or risk breaking things that rely on stdout of other programs in pipes. Either open own file for errors or write to stderr
 
@@ -43,7 +44,7 @@ void myinit(int argc, char **argv, char **envp) {
   // Check for SP_OUTFILE and either open it or dup stdout
   char *sp_outfile=getenv("SP_OUTFILE");
 
-  bash_line=-1;
+  bash_line=-100;
 
   char *shlvl_str=getenv("SHLVL");
   if(shlvl_str) shlvl=atoi(shlvl_str);
@@ -70,7 +71,7 @@ void myinit(int argc, char **argv, char **envp) {
   if(ln)
     bash_line=atoi(ln);
   else
-    bash_line=-1;
+    bash_line=-17;
   printf("bash_line %d\n",bash_line);
   bash_source=getenv("BS");
   if (!bash_source) bash_source="Not set:";
@@ -111,6 +112,14 @@ static void myfini()
 
   double elapsed=(double)(te.tv_sec-t_start.tv_sec) +
     1.e-6*(double)(te.tv_usec-t_start.tv_usec);
+
+  char start_time_str[256]="";
+  
+//  time_t nowtime = t_start.tv_sec;
+//  struct tm *nowtm;
+//  nowtm = localtime(&nowtime);
+//
+//  strftime(&start_time_str, 256, "%Y-%m-%d %H:%M:%S", nowtm);
 
   pid_t pid=getpid();
 

@@ -9,6 +9,8 @@
 ##   echo "using SP_OUTFILE=$SP_OUTFILE instead"
 ## fi
 
+: ${SP_OUTFILE:?"SP_OUTFILE must be set"}
+
 export MY_SHELL_SCRIPT="${1}_temp"
 
 

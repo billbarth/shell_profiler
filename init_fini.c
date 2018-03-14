@@ -65,14 +65,14 @@ void myinit(int argc, char **argv, char **envp) {
   // fix error check later
   // Hide LINENO testing code for now
   // bash_line=calloc(256,sizeof(char));
- printf("LN: %s\n",getenv("LN"));
+  // printf("LN: %s\n",getenv("LN"));
 
   char *ln=getenv("LN");
   if(ln)
     bash_line=atoi(ln);
   else
     bash_line=-17;
-  printf("bash_line %d\n",bash_line);
+  //  printf("bash_line %d\n",bash_line);
   bash_source=getenv("BS");
   if (!bash_source) bash_source="Not set:";
   

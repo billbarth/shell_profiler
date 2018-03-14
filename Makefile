@@ -1,5 +1,6 @@
-CC=gcc
+CC=gcc #works with GCC and Intel
 
+# GCC and Intel do different things with --std=c99 and use different numbers of minus signs for long arguments. Detect the right thing here.
 ifeq ($(CC),gcc)
 STD_FLAG=--std=c99
 else

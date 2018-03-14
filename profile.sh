@@ -96,7 +96,7 @@ function clean_up
 {
   if [ -f $TRAP_ENV ]; then
     rm $TRAP_ENV
-    
+    rm $MY_SHELL_SCRIPT
   fi
 }
 

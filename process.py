@@ -78,7 +78,10 @@ def main():
     maxmin=max_cmd_width+"."+max_cmd_width
     fmt_str="%19s "+"%-"+maxmin+"s(%4d): %-"+"20.20"+"s %15.7g %15.7g %15.7g"
     print( fmt_str % (start_str,bash_source,bash_line,cmd_str, et, ut, st) )
-    print('+'*shlvl+' '+bash_source+":"+str(bash_line)+":"+linecache.getline(bash_source,bash_line),end='')
+    ## print('+'*shlvl+' '+bash_source+":"+str(bash_line)+":"+linecache.getline(bash_source,bash_line),end='')
+
+    ## Put this back if you want to actually print the source line that did it
+    ## print(bash_source+":"+str(bash_line)+":"+linecache.getline(bash_source,bash_line),end='')
 
   ## Aggregate all the data below. Now we have line numbers, so print that
   ## instead
